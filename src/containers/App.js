@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import CardList from "../components/CardList";
 import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll"
@@ -6,50 +6,59 @@ import './App.css'
 import ErrorBoundry from "../components/ErrorBoundry";
 
 
-class App extends Component {
+function App() {
 
-    constructor() {
-        super()
-        this.state = {
-            robots: [],
-            searchField: ''
-        }
-    }
+    /*     constructor() {
+            super()
+            this.state = {
+                robots: [],
+                searchField: ''
+            }
+        } 
+    */
+    const [robots, setRobots] = useState([]);
+    const [searchField, setSearchField] = useState('');
+    const [count, setCount] = useState(0);
 
-    componentDidMount() {
+    /* 
+        componentDidMount() {
+    
+            fetch('https://jsonplaceholder.typicode.com/users')
+                .then(response => response.json())
+                .then(users => { this.setState({ robots: users }) });
+        } 
+    */
 
+    useEffect(() => {
         fetch('https://jsonplaceholder.typicode.com/users')
             .then(response => response.json())
-            .then(users => { this.setState({ robots: users }) });
+            .then(users => { setRobots(users) });
+    },[count])
+
+
+    const onSearchChange = (event) => {
+        setSearchField(event.target.value)
     }
 
-
-    onSearchChange = (event) => {
-        this.setState({ searchField: event.target.value })
-    }
-
-
-    render() {
-
-        const { robots, searchField } = this.state;
-        const filterRobots = robots.filter(robot => {
-            return robot.name.toLowerCase().includes(searchField.toLowerCase());
-        })
-        return !robots.length ?
-            <h1>Loading</h1>
-            :
-            (
-                <div className="tc">
-                    <h1 className="f2">RoboFriends</h1>
-                    <SearchBox searchChange={this.onSearchChange} />
-                    <Scroll>
-                        <ErrorBoundry>
+    const filterRobots = robots.filter(robot => {
+        return robot.name.toLowerCase().includes(searchField.toLowerCase());
+    })
+    return !robots.length ?
+        <h1>Loading</h1>
+        :
+        (
+            <div className="tc">
+                <h1 className="f2">RoboFriends</h1>
+                <button onClick={() => setCount(count + 1)}>Click me</button>
+                <SearchBox searchChange={onSearchChange} />
+                <Scroll>
+                    <ErrorBoundry>
                         <CardList robots={filterRobots} />
-                        </ErrorBoundry>
-                    </Scroll>
-                </div>
-            )
-    }
+                    </ErrorBoundry>
+                </Scroll>
+            </div>
+        )
+
 }
 
 export default App
